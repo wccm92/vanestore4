@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+
+  backend1:
+    build:
+      context: ./secAndRouter
+      dockerfile: Dockerfile
+    container_name: router-java-app
+    ports:
+      - "8081:8081"
+    networks:
+      - vanestore
+
+  backend2:
+    build:
+      context: ./vane_market_place
+      dockerfile: Dockerfile
+    container_name: vanestore-container-app
+    ports:
+      - "8083:8083"
+    networks:
+      - vanestore
+
+  backend3:
+    build:
+      context: ./mongoClientHttp
+      dockerfile: Dockerfile
+    container_name: mongo-client-container-app
+    ports:
+      - "8080:8080"
+    networks:
+      - vanestore
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - vanestore
+
+volumes:
+  mongo-data:
+
+networks:
+  vanestore:
+    name: vanestore
+    driver: bridge
